@@ -26,45 +26,55 @@ public final class CleanTweet {
 
     private String filename;
     private String  wordUntilFilename;
+    private String  wordUntilTestFilename;
     private Root root;
     private String type;
     private List<Tweet> tweets;
     private List<String> polarity;
     private List<String> wordUntil;
+    private List<String> wordUntilTest;
 
     public CleanTweet(String filename, String type) throws JAXBException, IOException {
         this.filename = filename;
         this.type = type;
-        this.wordUntilFilename = "src/data/until_word.txt";
-        this.wordUntil = new ArrayList<>();
-        this.TxttoArray();
         this.tweets = new ArrayList<>();
         if ("NonAnnote".equals(this.type)) {
+        	this.wordUntilFilename = "src/data/until_word.txt";
+            this.wordUntil = new ArrayList<>();
             this.root = this.xmlfiletoObject(this.filename);
             this.tweets = this.root.getTweet();
+            this.TxttoArray(this.wordUntilFilename);
         } else if ("Annote".equals(this.type)){
+        	this.wordUntilFilename = "src/data/until_word.txt";
+            this.wordUntil = new ArrayList<>();
             this.polarity = new ArrayList<>();
             this.CsvTpToObject();
-            
+            this.TxttoArray(this.wordUntilFilename);
         }else if ("Test".equals(this.type)){
+        	this.wordUntilTestFilename = "src/data/until_word_test.txt";
+            this.wordUntilTest = new ArrayList<>();
             this.CsvTestToObject();
+            this.TxttoArray(this.wordUntilTestFilename);
         }
+        
         for (Tweet temp : this.tweets) {
             temp.removeUrl();
             temp.removeAllNumber();
             temp.removePunctuation();
             temp.lowerCase();
-            temp.setMessage(this.removeAllUnitlWord(temp.getMessage()));
-            temp.removeSpaces();
         }
+        
         if("Test".equals(this.type)){
+        	this.removeAllUnitlWord(this.wordUntilTest);
             this.exportToCsv("src/result/clean_test_tweet.csv");
         }else if ("NonAnnote".equals(this.type)) {
+        	this.removeAllUnitlWord(this.wordUntil);
         	this.CleanList();
             this.removeDuplicatesForNotAnnotetd();
             this.exportToCsv("src/result/clean_tweet.csv");
         } else if ("Annote".equals(this.type)){
             this.SetPolarityForTestTweet();
+            this.removeAllUnitlWord(this.wordUntil);
             this.CleanList();
             this.removeDuplicates();
             this.exportToCsv("src/result/clean_tp_tweet.csv");
@@ -79,8 +89,8 @@ public final class CleanTweet {
         return root;
     }
     
-    public void TxttoArray () throws IOException {
-    	try (BufferedReader br = new BufferedReader(new FileReader(this.wordUntilFilename))) {
+    public void TxttoArray (String filename) throws IOException {
+    	try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
                 this.wordUntil.add(line);
@@ -150,8 +160,7 @@ public final class CleanTweet {
         try (BufferedReader br = new BufferedReader(new FileReader(this.filename))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] values = line.split("\\r?\\n");
-                String[] values1 = values[0].split("\\t");
+                String[] values1 = line.split("\\t");
                 this.tweets.add(new Tweet(values1[1]));
                 this.polarity.add(values1[2]);
             }
@@ -173,17 +182,19 @@ public final class CleanTweet {
         }
     }
     
-    public String removeAllUnitlWord (String tweet) {
+    public void removeAllUnitlWord (List<String> words) {
     	String s="";
-    	String[] arr = tweet.split(" ");    
-
-    	for ( String ss : arr) {
-    		if(!this.wordUntil.contains(ss)) {
-    			s = s + " "+ss;
-    		}
-    	    
-    	}
-    	return s;
+    	for (Tweet temp : this.tweets) {
+    		String[] arr = temp.getMessage().split("\\s+"); 
+    		for ( String ss : arr) {
+        		if(!words.contains(ss)) {
+        			s = s + " "+ss;
+        		}
+        	    
+        	}
+    		temp.setMessage(s);
+    		temp.removeSpaces();
+        }
     }
 
     public void exportToCsv(String filename) throws IOException {

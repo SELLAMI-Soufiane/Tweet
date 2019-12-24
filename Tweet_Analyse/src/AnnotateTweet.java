@@ -90,6 +90,10 @@ public class AnnotateTweet {
                     this.TweetAnnoted.add(values1[0] + "\t" + "autre");
                 } else if ("mixed".equals(values1[1])) {
                     this.TweetAnnoted.add(values1[0] + "\t" + "mixte");
+                }else if ("positive".equals(values1[1])) {
+                	this.TweetAnnoted.add(values1[0] + "\t" + "positif");
+                }else if ("negative".equals(values1[1])) {
+                	this.TweetAnnoted.add(values1[0] + "\t" + "negatif");
                 }
 
             }
@@ -138,13 +142,13 @@ public class AnnotateTweet {
                         this.TweetAnnoted.add(tweet+"\t"+respons);
                     }
                 }else if(score < -1){
-                    this.TweetAnnoted.add(tweet+"\t"+"negative");
+                    this.TweetAnnoted.add(tweet+"\t"+"negatif");
                 }else if(score <= 1 && score >= -1){
                     this.TweetAnnoted.add(tweet+"\t"+"autre");
                 }else if (score <= 5 && score >= 1){
                     this.TweetAnnoted.add(tweet+"\t"+"mixte");
                 }else if (score > 5){
-                    this.TweetAnnoted.add(tweet+"\t"+"positive");
+                    this.TweetAnnoted.add(tweet+"\t"+"positif");
                 }
             }
         }
