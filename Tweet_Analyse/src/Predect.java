@@ -56,9 +56,9 @@ public class Predect {
             if("0".equals(this.result.get(i))){
                 resultTweet = "autre";
             }else if ("1".equals(this.result.get(i))){
-                resultTweet = "negative";
+                resultTweet = "negatif";
             }else if ("2".equals(this.result.get(i))){
-                resultTweet = "positive";
+                resultTweet = "positif";
             }else if ("3".equals(this.result.get(i))){
                 resultTweet = "mixte";
             }
