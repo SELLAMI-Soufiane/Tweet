@@ -25,14 +25,19 @@ import javax.xml.bind.Unmarshaller;
 public final class CleanTweet {
 
     private String filename;
+    private String  wordUntilFilename;
     private Root root;
     private String type;
     private List<Tweet> tweets;
     private List<String> polarity;
+    private List<String> wordUntil;
 
     public CleanTweet(String filename, String type) throws JAXBException, IOException {
         this.filename = filename;
         this.type = type;
+        this.wordUntilFilename = "src/data/until_word.txt";
+        this.wordUntil = new ArrayList<>();
+        this.TxttoArray();
         this.tweets = new ArrayList<>();
         if ("NonAnnote".equals(this.type)) {
             this.root = this.xmlfiletoObject(this.filename);
@@ -46,17 +51,22 @@ public final class CleanTweet {
         }
         for (Tweet temp : this.tweets) {
             temp.removeUrl();
-            temp.removePunctuation();
             temp.removeAllNumber();
+            temp.removePunctuation();
             temp.lowerCase();
+            temp.setMessage(this.removeAllUnitlWord(temp.getMessage()));
             temp.removeSpaces();
         }
         if("Test".equals(this.type)){
             this.exportToCsv("src/result/clean_test_tweet.csv");
         }else if ("NonAnnote".equals(this.type)) {
+        	this.CleanList();
+            this.removeDuplicatesForNotAnnotetd();
             this.exportToCsv("src/result/clean_tweet.csv");
         } else if ("Annote".equals(this.type)){
             this.SetPolarityForTestTweet();
+            this.CleanList();
+            this.removeDuplicates();
             this.exportToCsv("src/result/clean_tp_tweet.csv");
         }
     }
@@ -67,6 +77,63 @@ public final class CleanTweet {
 
     public Root getRoot() {
         return root;
+    }
+    
+    public void TxttoArray () throws IOException {
+    	try (BufferedReader br = new BufferedReader(new FileReader(this.wordUntilFilename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                this.wordUntil.add(line);
+            }
+        }
+    }
+    
+    public void CleanList (){
+        List<Tweet> tempList = new ArrayList<>();
+        for (Tweet temp : this.tweets) {
+            int count = this.countWordsUsingSplit(temp.getMessage());
+            if(count == 0 || count <= 2){
+                tempList.add(temp);
+            }
+        }
+        this.tweets.removeAll(tempList);
+    }
+    public void removeDuplicatesForNotAnnotetd() 
+    { 
+        List<Tweet> tempList = new ArrayList<>();
+        for (Tweet temp : this.tweets) {
+            tempList.add(new Tweet(temp.getMessage()));
+        }
+        this.tweets.clear();
+        
+        
+        for (Tweet temp : tempList) {
+            if(!this.tweets.contains(temp)){
+                this.tweets.add(temp);
+            }
+        }
+    }
+    
+    public void removeDuplicates() 
+    { 
+
+        List<Tweet> tempList = new ArrayList<>();
+        
+        for (Tweet temp : this.tweets) {
+            if(!tempList.contains(temp)){
+                tempList.add(temp);
+            }
+        }
+        this.tweets = tempList;
+    } 
+    
+    public int countWordsUsingSplit(String input) {
+        if (input == null || input.isEmpty()) {
+            return 0;
+        }
+
+        String[] words = input.split("\\s+");
+        return words.length;
     }
 
     public Root xmlfiletoObject(String filename) throws JAXBException {
@@ -104,6 +171,19 @@ public final class CleanTweet {
                 this.tweets.add(new Tweet(line));
             }
         }
+    }
+    
+    public String removeAllUnitlWord (String tweet) {
+    	String s="";
+    	String[] arr = tweet.split(" ");    
+
+    	for ( String ss : arr) {
+    		if(!this.wordUntil.contains(ss)) {
+    			s = s + " "+ss;
+    		}
+    	    
+    	}
+    	return s;
     }
 
     public void exportToCsv(String filename) throws IOException {

@@ -1,3 +1,6 @@
+/data/
+/libs/
+/result/
 /AnnotateTweet.class
 /CleanTweet.class
 /Predect.class
@@ -6,6 +9,3 @@
 /Root.class
 /Tweet.class
 /Tweet_Analyse.class
-/data/
-/libs/
-/result/

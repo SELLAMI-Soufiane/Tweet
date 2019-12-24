@@ -56,7 +56,7 @@ public class PrepareSVM {
                     polarity = "2";
                 }else if ("mixte".equals(values[2])){
                     polarity = "3";
-                }else if ("autre".equals(values[2])){
+                }else{
                     polarity = "0";
                 }
                 Map<Integer, String> wordLine = new HashMap<>();

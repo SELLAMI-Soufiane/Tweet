@@ -95,13 +95,15 @@ public class Tweet {
     
     public void removeUrl (){
         String regex = "(http|https|ftp|ftps)?://\\S+\\s?";
-        this.message = this.message.replaceAll(regex, "");
+        this.message = this.message.replaceAll(regex, " ");
     }
     
     public void removePunctuation  (){
-        String regex = "[\\p{Punct}&&[^']]+";
+        //String regex = "[\\p{Punct}&&[^']]+";
+        String regex = "[\\p{Punct}]+";
         this.message = this.message.replaceAll(regex, " ");
         this.message = this.message.replace("...", "");
+        this.message = this.message.replace("…", "");
         this.message = this.message.replace("â€¦", "");
         //regex = "[-+.^:,]+";
         //this.message = this.message.replaceAll(regex, "");

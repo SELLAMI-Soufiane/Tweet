@@ -58,7 +58,7 @@ public class PrepareData {
                 count++;
                 String str1 = Integer.toString(count);
                 if("test".equals(type)){
-                    out.write(str1+"\t"+temp+"\t"+"autre");
+                    out.write(str1+"\t"+temp+"\t"+"objective");
                 }else {
                     out.write(str1+"\t"+temp);
                 }
